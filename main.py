@@ -31,6 +31,7 @@ def main() -> None:
     bind_sock.bind((UDP_IP, UDP_PORT))
 
     health_check_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+    health_check_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  
     health_check_socket.bind((UDP_IP, HEALTHCHECK_PORT))
     health_check_socket.listen(100)
 
