@@ -42,7 +42,7 @@
 
 * As explained in the [ Centralized inspection architecture with AWS Gateway Load Balancer and AWS Transit Gateway blog](https://aws.amazon.com/blogs/networking-and-content-delivery/centralized-inspection-architecture-with-aws-gateway-load-balancer-and-aws-transit-gateway/), to ensure flow symmetry, Transit Gateway appliance mode should be enabled on the Appliance VPC attachment. In example below, application instance in Availability Zone (AZ) A of Spoke1 VPC tries to SSH into application instances in AZ A and AZ C of Spoke2 VPC.
 
-* [reference blog](https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-aws-gateway-load-balancer-supported-architecture-patterns/#:~:text=With%20the%20AWS%20Transit%20Gateway%20appliance,Transit%20Gateway%20appliance%20mode%C2%A0here.))
+* [reference blog](https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-aws-gateway-load-balancer-supported-architecture-patterns/#:~:text=With%20the%20AWS%20Transit%20Gateway%20appliance,Transit%20Gateway%20appliance%20mode%C2%A0here.)
 
 * From Spoke2 VPC stack Outputs tab, get the private IP addresses of the application instances:
 
