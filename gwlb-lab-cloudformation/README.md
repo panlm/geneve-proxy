@@ -14,7 +14,16 @@
    * Appliance creates VPC Endpoint Service Name required for the Spoke VPC. Spoke VPC creates Gateway Load Balancer Endpoint using the VPC Endpoint Service created by Appliance VPC 
 
 ### **Appliance VPC:**
-* [GWLB Appliance VPC Sample](DistributedArchitectureApplianceVpc2Az.yaml)
+* 创建ssh key
+* 部署cloudformation模版
+  * [GWLB Appliance VPC Sample](DistributedArchitectureApplianceVpc2Az.yaml)
+  * 指定：stack名称、选择2个不同的region、选择ssh key，其他保持默认
+  * 开始创建
+* 记录service name，下一步需要
+  * `vpc` --> `endpoint services` --> `service name`
 
 ### **Spoke VPC:**
-* [GWLB Spoke VPC Sample](DistributedArchitectureSpokeVpc2Az.yaml)
+* 部署cloudformation模版
+  * [GWLB Spoke VPC Sample](DistributedArchitectureSpokeVpc2Az.yaml)
+  * 指定：stack名称、选择2个不同的region、选择ssh key、输入上一步获取的service name，其他保持默认
+  * 开始创建
