@@ -1,44 +1,44 @@
-## AWS Gateway Load Balancer In Centralized Architecture
-
-[source](https://github.com/aws-samples/aws-gateway-load-balancer-code-samples/tree/main/aws-cloudformation/centralized_architecture)
+## AWS Gateway Load Balancer In Centralized Architecture [original](https://github.com/aws-samples/aws-gateway-load-balancer-code-samples/tree/main/aws-cloudformation/centralized_architecture)
 
 ### Welcome
 
-* This section contains sample AWS Cloudformation templates that demonstrates how to create centralized inspection architecture using AWS Gateway Load Balancer (GWLB) AWS Gateway Load Balancer Endpoints (GWLBe), virtual appliances and AWS Transit Gateway (TGW) from templates that are written in YAML.
+* 本部分包含 AWS Cloudformation 模板示例，演示如何使用 AWS Gateway Load Balancer (GWLB)、AWS Gateway Load Balancer Endpoints (GWLBe)、模拟设备(virtual appliances)和 AWS Transit Gateway (TGW) 从以 YAML 编写的模板创建集中防火墙检测架构
 
-* For more details, refer to blog: **[Centralized inspection architecture with AWS Gateway Load Balancer and AWS Transit Gateway](https://aws.amazon.com/blogs/networking-and-content-delivery/centralized-inspection-architecture-with-aws-gateway-load-balancer-and-aws-transit-gateway/)**
+* 查看这篇blog以获取更多信息: **[Centralized inspection architecture with AWS Gateway Load Balancer and AWS Transit Gateway](https://aws.amazon.com/blogs/networking-and-content-delivery/centralized-inspection-architecture-with-aws-gateway-load-balancer-and-aws-transit-gateway/)**
 
 ![Figure 1: GWLB Centralized Architecture](images/gwlb_centralized_architecture.jpg)
 _Figure 1: GWLB Centralized Architecture_
 
-* **Launch CloudFormation templates in following order:**
-  1. Appliance VPC Template
-  2. Spoke1 VPC Template
-  3. Spoke2 VPC Template
-  4. Transit Gateway Template. Transit Gateway Template is dependent on Appliance VPC, Spoke1 VPC and Spoke2 VPC templates. Template will fail if launched before successfuly deployments of above 3 templates.
+* 按照以下顺序部署 cloudformation 模版
+  1. Appliance VPC 模版
+  2. Spoke1 VPC 模版
+  3. Spoke2 VPC 模版
+  4. Transit Gateway 模版. 此模版依赖于前三个模版成功部署.
+* 或者直接部署 **一键部署** 模版
+
 
 ### **Appliance VPC:**
 * [GWLB Appliance VPC Sample](CentralizedArchitectureApplianceVpc2Az.yaml)
 
 ### **Spoke VPCs:**
-* We use the same spoke VPC template for both Spoke1 VPC and Spoke2 VPC. When deploying the template for Spoke2 VPC, make sure you have changed the default values so that Spoke2 VPC has different VPC and related subnet network addresses.
+* 我们对 Spoke1 VPC 和 Spoke2 VPC 使用相同的 Spoke VPC 模板。 为 Spoke2 VPC 部署模板时，请确保您已更改默认值，以便 Spoke2 VPC 具有不同的 VPC 和相关子网网络地址。
 
 * [GWLB Spoke1 VPC Sample](CentralizedArchitectureSpokeVpc2Az.yaml)
 * [GWLB Spoke2 VPC Sample](CentralizedArchitectureSpokeVpc2Az.yaml)
 
 ### **Transit Gateway:**
 * [GWLB Transit Gateway Sample](CentralizedArchitectureTgw.yaml)
-  * Use appropriate values for the parameters. 
-  * Use Appliance VPC and Spoke VPCs stack Outputs section to retrieve the values.
-  * Template enables Transit Gateway appliance mode.
+  * 为参数选择合适的值
+  * 查看 Appliance VPC 和 Spoke VPCs 的 Output 获取值
+  * 启用 Transit Gateway appliance 模式
 
 ### Enable Transit Gateway Appliance Mode:
 
-* To ensure flow symmetry, Transit Gateway appliance mode should be enabled on the Appliance VPC’s attachment. 
+* 为了确保对称的数据流, 在连接 Appliance VPC 的 attachment 上启用 Transit Gateway 的 appliance 模式 
 
-* [GWLB Transit Gateway Sample](CentralizedArchitectureTgw.yaml) enables appliance mode for the Appliance VPC attachment. 
+* [GWLB Transit Gateway Sample](CentralizedArchitectureTgw.yaml)
 
-* You can also enable/disable appliance mode using AWS CLI. Once Transit Gateway template has been successfully deployed, fetch the Appliance VPC Attachment ID from stack's Outputs tab and enable/disable applince mode using AWS CLI as shown below. Replace the parameter values inside '< >' with appropriate values.
+* 您还可以使用 AWS CLI 启用/禁用 appliance 模式。 成功部署 Transit Gateway 模板后，从堆栈的输出选项卡中获取设备 VPC Attachment ID，并使用 AWS CLI 启用/禁用 appliance 模式，如下所示。 将 '< >' 内的参数值替换为适当的值
 
 ```bash
 aws ec2 modify-transit-gateway-vpc-attachment \
@@ -46,10 +46,14 @@ aws ec2 modify-transit-gateway-vpc-attachment \
     --options ApplianceModeSupport=enable
 ```
 
-### 1-Click Deployment:
+### 一键部署:
 
-* Alternatively, you can deploy [gwlb centralized architecture stack](https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/create/template?stackName=GwlbCentralizedDemo&templateURL=https://tech-content-us-west-2.s3-us-west-2.amazonaws.com/aws-gwlb-cloudformation-samples/centralized-architecture/nested-stack/CentralizedArchitecturePrimary.yaml) and it will provision the resources as described in _Figure 1: GWLB Centralized Architecture_. 
-  * While the link above launches the stack in Oregon (us-west-2) region, you can change the region to your choice. Make sure GWLB is supported in the region you choose to deploy the stack in.
+* 另外, 你可以部署 [gwlb centralized architecture stack](https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/create/template?stackName=GwlbCentralizedDemo&templateURL=https://tech-content-us-west-2.s3-us-west-2.amazonaws.com/aws-gwlb-cloudformation-samples/centralized-architecture/nested-stack/CentralizedArchitecturePrimary.yaml)，它将提供资源，如图 1 中所述 
+  * 虽然上面的链接在俄勒冈 (us-west-2) 区域启动堆栈，但您可以将区域更改为您的选择。 确保您选择在其中部署堆栈的区域支持 GWLB。
 
-### Validation Steps:
+### 验证步骤:
 * [GWLB Centralized Architecture Validation](CentralizedArchitectureValidation.md)
+
+
+
+
