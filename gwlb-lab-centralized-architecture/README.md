@@ -20,15 +20,15 @@ _Figure 1: GWLB Centralized Architecture_
   4. Transit Gateway 模版. 此模版依赖于前三个模版成功部署.
 * 或者直接部署 **一键部署** 模版
 
-### **Appliance VPC:**
+### **Appliance VPC**
 * [GWLB Appliance VPC 示例](CentralizedArchitectureApplianceVpc2Az.yaml)
 
-### **Spoke VPCs:**
+### **Spoke VPCs**
 * 我们对 Spoke1 VPC 和 Spoke2 VPC 使用相同的 Spoke VPC 模板。 为 Spoke2 VPC 部署模板时，请确保您已更改默认值，以便 Spoke2 VPC 具有不同的 VPC 和相关子网网络地址。
   * [GWLB Spoke1 VPC 示例](CentralizedArchitectureSpokeVpc2Az.yaml)
   * [GWLB Spoke2 VPC 示例](CentralizedArchitectureSpokeVpc2Az.yaml)
 
-### **Transit Gateway:**
+### **Transit Gateway**
 * [GWLB Transit Gateway 示例](CentralizedArchitectureTgw.yaml)
   * 为参数选择合适的值
   * 查看 Appliance VPC 和 Spoke VPCs 的 Output 获取值
@@ -36,11 +36,9 @@ _Figure 1: GWLB Centralized Architecture_
 
 ### Enable Transit Gateway Appliance Mode:
 
-* 为了确保对称的数据流, 在连接 Appliance VPC 的 attachment 上启用 Transit Gateway 的 appliance 模式 
-
 * [GWLB Transit Gateway Sample](CentralizedArchitectureTgw.yaml)
-
-* 您还可以使用 AWS CLI 启用/禁用 appliance 模式。 成功部署 Transit Gateway 模板后，从堆栈的输出选项卡中获取设备 VPC Attachment ID，并使用 AWS CLI 启用/禁用 appliance 模式，如下所示。 将 '< >' 内的参数值替换为适当的值
+  * 为了确保对称的数据流, 在连接 Appliance VPC 的 attachment 上启用 Transit Gateway 的 appliance 模式 
+  * 您还可以使用 AWS CLI 启用/禁用 appliance 模式。 成功部署 Transit Gateway 模板后，从堆栈的输出选项卡中获取设备 VPC Attachment ID，并使用 AWS CLI 启用/禁用 appliance 模式，如下所示。 将 '< >' 内的参数值替换为适当的值
 
 ```bash
 aws ec2 modify-transit-gateway-vpc-attachment \
@@ -48,10 +46,12 @@ aws ec2 modify-transit-gateway-vpc-attachment \
     --options ApplianceModeSupport=enable
 ```
 
-### 一键部署:
-
-* 另外, 你可以部署 [gwlb centralized architecture stack](https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/create/template?stackName=GwlbCentralizedDemo&templateURL=https://tech-content-us-west-2.s3-us-west-2.amazonaws.com/aws-gwlb-cloudformation-samples/centralized-architecture/nested-stack/CentralizedArchitecturePrimary.yaml)，它将提供资源，如图 1 中所述 
+### 一键部署
+* 部署会创建 3 个 vpc ，确保你有足够的 service quota 
+* 在你期望部署的区域中新建 key pair，使用 pem 格式，并保存 private key
+* 直接部署 [gwlb centralized architecture stack](https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/create/template?stackName=GwlbCentralizedDemo&templateURL=https://tech-content-us-west-2.s3-us-west-2.amazonaws.com/aws-gwlb-cloudformation-samples/centralized-architecture/nested-stack/CentralizedArchitecturePrimary.yaml)，它将创建图 1 中所述的所有资源
   * 虽然上面的链接在俄勒冈 (us-west-2) 区域启动堆栈，但您可以将区域更改为您的选择。 确保您选择在其中部署堆栈的区域支持 GWLB。
+  * 部署模版时：1）指定两个不同的可用区；2）指定 key pair
 
 * 你可以找到所有模版文件在[nested-stack](nested-stack)目录下
 
