@@ -25,6 +25,7 @@ spoke2_stack_name=$(echo $sub_stack_name |xargs -n 1 |grep 'Spoke2VpcStack')
 
 echo "export key_file=$key_file" >> ~/.bash_profile
 echo "export stack_name=$stack_name" >> ~/.bash_profile
+echo "export region_name=$region_name" >> ~/.bash_profile
 echo "export tgw_stack_name=$tgw_stack_name" >> ~/.bash_profile
 echo "export appliance_stack_name=$appliance_stack_name" >> ~/.bash_profile
 echo "export spoke1_stack_name=$spoke1_stack_name" >> ~/.bash_profile
@@ -32,7 +33,13 @@ echo "export spoke2_stack_name=$spoke2_stack_name" >> ~/.bash_profile
 echo "alias ssh='ssh -o StrictHostKeyChecking=no'" >> ~/.bash_profile
 source ~/.bash_profile
 
-# get addresses
+# get output from tgw
+tgw_attachment_id=$(aws cloudformation describe-stacks \
+  --stack-name $tgw_stack_name \
+  --query  "Stacks[0].Outputs[?OutputKey=='TgwApplianceVpcAttachmendId'].OutputValue" \
+  --output text)
+
+# get addresses for appliance
 appliance_bastion_pub_ip=$(aws cloudformation describe-stacks \
   --stack-name $appliance_stack_name \
   --query  "Stacks[0].Outputs[?OutputKey=='ApplianceBastionHostPublicIp'].OutputValue" \
@@ -50,7 +57,7 @@ echo "export appliance_bastion_pub_ip=$appliance_bastion_pub_ip" >> ~/.bash_prof
 echo "export appliance1_priv_ip=$appliance1_priv_ip" >> ~/.bash_profile
 echo "export appliance2_priv_ip=$appliance2_priv_ip" >> ~/.bash_profile
 
-# put connection to appliance1
+# put connection to appliance
 cat $key_file |\
   ssh ec2-user@$appliance_bastion_pub_ip -i $key_file \
     'cat - > /tmp/key ; chmod 600 /tmp/key'
@@ -61,7 +68,7 @@ echo "ssh ec2-user@$appliance2_priv_ip -i /tmp/key" |\
   ssh ec2-user@$appliance_bastion_pub_ip -i $key_file \
     'cat - > ~/connect-to-appliance2.sh ; chmod a+x ~/connect-to-appliance2.sh'
 
-# get addresses
+# get addresses for spoke1
 spoke1_bastion_pub_ip=$(aws cloudformation describe-stacks \
   --stack-name $spoke1_stack_name \
   --query  "Stacks[0].Outputs[?OutputKey=='SpokeBastionHostPublicIp'].OutputValue" \
@@ -79,7 +86,7 @@ echo "export spoke1_bastion_pub_ip=$spoke1_bastion_pub_ip" >> ~/.bash_profile
 echo "export spoke1_application1_priv_ip=$spoke1_application1_priv_ip" >> ~/.bash_profile
 echo "export spoke1_application2_priv_ip=$spoke1_application2_priv_ip" >> ~/.bash_profile
 
-# put connection to spoke1
+# put connection to spoke1's instance
 cat $key_file |\
   ssh ec2-user@$spoke1_bastion_pub_ip -i $key_file \
     'cat - > /tmp/key ; chmod 600 /tmp/key'
@@ -88,6 +95,35 @@ echo "ssh ec2-user@$spoke1_application1_priv_ip -i /tmp/key" |\
     'cat - > ~/connect-to-application1.sh ; chmod a+x ~/connect-to-application1.sh'
 echo "ssh ec2-user@$spoke1_application2_priv_ip -i /tmp/key" |\
   ssh ec2-user@$spoke1_bastion_pub_ip -i $key_file \
+    'cat - > ~/connect-to-application2.sh ; chmod a+x ~/connect-to-application2.sh'
+
+# get addresses for spoke2
+spoke2_bastion_pub_ip=$(aws cloudformation describe-stacks \
+  --stack-name $spoke2_stack_name \
+  --query  "Stacks[0].Outputs[?OutputKey=='SpokeBastionHostPublicIp'].OutputValue" \
+  --output text)
+spoke2_application1_priv_ip=$(aws cloudformation describe-stacks \
+  --stack-name $spoke2_stack_name \
+  --query  "Stacks[0].Outputs[?OutputKey=='SpokeApplication1PrivateIp'].OutputValue" \
+  --output text)
+spoke2_application2_priv_ip=$(aws cloudformation describe-stacks \
+  --stack-name $spoke2_stack_name \
+  --query  "Stacks[0].Outputs[?OutputKey=='SpokeApplication2PrivateIp'].OutputValue" \
+  --output text)
+
+echo "export spoke2_bastion_pub_ip=$spoke2_bastion_pub_ip" >> ~/.bash_profile
+echo "export spoke2_application1_priv_ip=$spoke2_application1_priv_ip" >> ~/.bash_profile
+echo "export spoke2_application2_priv_ip=$spoke2_application2_priv_ip" >> ~/.bash_profile
+
+# put connection to spoke2's instance
+cat $key_file |\
+  ssh ec2-user@$spoke2_bastion_pub_ip -i $key_file \
+    'cat - > /tmp/key ; chmod 600 /tmp/key'
+echo "ssh ec2-user@$spoke2_application1_priv_ip -i /tmp/key" |\
+  ssh ec2-user@$spoke2_bastion_pub_ip -i $key_file \
+    'cat - > ~/connect-to-application1.sh ; chmod a+x ~/connect-to-application1.sh'
+echo "ssh ec2-user@$spoke2_application2_priv_ip -i /tmp/key" |\
+  ssh ec2-user@$spoke2_bastion_pub_ip -i $key_file \
     'cat - > ~/connect-to-application2.sh ; chmod a+x ~/connect-to-application2.sh'
 
 source ~/.bash_profile
@@ -164,32 +200,55 @@ ping 8.8.8.8
 
 ![](images/spoke2_vpc_stack_outputs.jpg)
 
-#### Transit Gateway appliance mode disabled:
-
-* With Transit Gateway appliance mode disabled, application instance in AZ A of Spoke1 VPC is able to access application instance in AZ A of Spoke2 VPC over SSH.
-
-![](images/ssh_access_spoke2_application1_appliancemode_disable.jpg)
-
-* Since application instance in AZ C of Spoke2 VPC is in a different AZ, it is not accessible.
-
-![](images/ssh_access_spoke2_application2_appliancemode_disable.jpg)
-
 #### Transit Gateway appliance mode enabled:
 
 * From Transit Gateway stack Outputs tab, get the Appliance VPC attahcment ID:
 
 ![](images/tgw_stack_outputs.jpg)
 
-* Enable Tranist Gateway appliance mode for the Appliance VPC attachment:
+```sh
+source ~/.bash_profile
 
-![](images/enable_appliancemode.jpg)
+aws ec2 describe-transit-gateway-vpc-attachments \
+  --transit-gateway-attachment-ids $tgw_attachment_id \
+  --region $region_name
+
+```
 
 * With Transit Gateway appliance mode enabled, application instance in AZ A of Spoke1 VPC is able to access both the application instances in Spoke2 VPC over SSH.
 
-* Application instance in AZ A of Spoke2 VPC:
+```sh
+source ~/.bash_profile
+echo "spoke2_application1_priv_ip:" $spoke2_application1_priv_ip
+echo "spoke2_application2_priv_ip:" $spoke2_application2_priv_ip
 
-![](images/ssh_access_spoke2_application1_appliancemode_enable.jpg)
+ssh ec2-user@$spoke1_bastion_pub_ip -i $key_file
+./connect-to-application1.sh
+ping -c 2 <spoke2_application1_priv_ip>
+ping -c 2 <spoke2_application2_priv_ip>
 
-* Application instance in AZ C of Spoke2 VPC:
+ssh ec2-user@$spoke1_bastion_pub_ip -i $key_file
+./connect-to-application2.sh
+ping -c 2 <spoke2_application1_priv_ip>
+ping -c 2 <spoke2_application2_priv_ip>
 
-![](images/ssh_access_spoke2_application2_appliancemode_enable.jpg)
+```
+
+#### Transit Gateway appliance mode disabled:
+
+* Disable Transit Gateway appliance mode
+
+```sh
+source ~/.bash_profile
+aws ec2 modify-transit-gateway-vpc-attachment \
+  --transit-gateway-attachment-id $tgw_attachment_id \
+  --options ApplianceModeSupport=disable \
+  --region $region_name
+
+```
+
+* wait one or two minutes
+
+* With Transit Gateway appliance mode disabled, application instance in AZ A of Spoke1 VPC is able to access application instance in AZ A of Spoke2 VPC over SSH.
+
+* Since application instance in AZ C of Spoke2 VPC is in a different AZ, it is not accessible.
