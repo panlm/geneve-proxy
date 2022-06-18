@@ -1,19 +1,22 @@
 ## AWS Gateway Load Balancer Centralized Architecture Validation
 
-### Welcome
+### 概述
 
-* This section walks you through steps to validate AWS Gateway Load Balancer Centralized Architecture.
+* 本章节提供步骤验证 GWLB 集中架构
+* 建议部署一台 cloud9 进行本章节验证步骤
+  * 将访问 Instance 的私钥上传到 cloud9 中
 
-### Validate access to resource on Internet from application running in Spoke1 VPC:
+### 验证从 Spoke1 VPC 中运行的应用程序访问 Internet
 
-* From Appliance VPC stack Outputs tab, get the public IP address of the bastion host and private IP addresses of the two appliances:
+* 通过以下脚本从cloudformation堆栈中获取各vpc的堡垒主机的公共 IP 地址和相关的私有 IP 地址。
 
 ![](images/appliance_vpc_stack_outputs.jpg)
 
 ```sh
-key_file=key
+sudo yum install -y jq
+key_file=key # 输入 private key 路径
+region_name=us-east-1 # 选择你的区域
 stack_name=GwlbCentralizedDemo
-region_name=us-east-2
 sub_stack_name=$(aws cloudformation describe-stack-resources \
   --stack-name $stack_name --region $region_name |\
   jq -r '.StackResources[].PhysicalResourceId' |\
@@ -38,6 +41,8 @@ tgw_attachment_id=$(aws cloudformation describe-stacks \
   --stack-name $tgw_stack_name \
   --query  "Stacks[0].Outputs[?OutputKey=='TgwApplianceVpcAttachmendId'].OutputValue" \
   --output text)
+
+echo "export tgw_attachment_id=$tgw_attachment_id" >> ~/.bash_profile
 
 # get addresses for appliance
 appliance_bastion_pub_ip=$(aws cloudformation describe-stacks \
@@ -130,7 +135,7 @@ source ~/.bash_profile
 
 ```
 
-* Access appliances through bastion host:
+* Access appliances 1/2 through bastion host:
 
 ![](images/access_appliances.jpg)
 
@@ -141,7 +146,7 @@ source ~/.bash_profile
 ssh ec2-user@$appliance_bastion_pub_ip -i $key_file
 ./connect-to-appliance1.sh
 
-sudo tcpdump -ni eth0 port 6081
+sudo tcpdump -ni eth0 port 6081 |grep 8.8.8.8
 
 ```
 
@@ -152,7 +157,7 @@ source ~/.bash_profile
 ssh ec2-user@$appliance_bastion_pub_ip -i $key_file
 ./connect-to-appliance2.sh
 
-sudo tcpdump -ni eth0 port 6081
+sudo tcpdump -ni eth0 port 6081 |grep 8.8.8.8
 
 ```
 
@@ -190,7 +195,7 @@ ping 8.8.8.8
 
 ![](images/http_access.jpg)
 
-### Validate access to application running in Spoke2 VPC from application running in Spoke1 VPC (East-West/VPC-to-VPC):
+### 验证从 Spoke1 VPC 到 Spoke2 VPC (East-West/VPC-to-VPC):
 
 * As explained in the [ Centralized inspection architecture with AWS Gateway Load Balancer and AWS Transit Gateway blog](https://aws.amazon.com/blogs/networking-and-content-delivery/centralized-inspection-architecture-with-aws-gateway-load-balancer-and-aws-transit-gateway/), to ensure flow symmetry, Transit Gateway appliance mode should be enabled on the Appliance VPC attachment. In example below, application instance in Availability Zone (AZ) A of Spoke1 VPC tries to SSH into application instances in AZ A and AZ C of Spoke2 VPC.
 
@@ -215,7 +220,7 @@ aws ec2 describe-transit-gateway-vpc-attachments \
 
 ```
 
-* With Transit Gateway appliance mode enabled, application instance in AZ A of Spoke1 VPC is able to access both the application instances in Spoke2 VPC over SSH.
+* 当 Transit Gateway appliance mode 启用, 在 Spoke1 VPC 中的应用实例可以访问 Spoke2 VPC 中的任何应用实例。以下 ping 操作都可以正常返回。
 
 ```sh
 source ~/.bash_profile
@@ -234,9 +239,9 @@ ping -c 2 <spoke2_application2_priv_ip>
 
 ```
 
-#### Transit Gateway appliance mode disabled:
+#### 禁用 Transit Gateway appliance mode:
 
-* Disable Transit Gateway appliance mode
+* 禁用 Transit Gateway appliance mode
 
 ```sh
 source ~/.bash_profile
@@ -247,8 +252,6 @@ aws ec2 modify-transit-gateway-vpc-attachment \
 
 ```
 
-* wait one or two minutes
+* 等待 1 到 2 分钟
 
-* With Transit Gateway appliance mode disabled, application instance in AZ A of Spoke1 VPC is able to access application instance in AZ A of Spoke2 VPC over SSH.
-
-* Since application instance in AZ C of Spoke2 VPC is in a different AZ, it is not accessible.
+* 当 Transit Gateway appliance mode 禁用,  在 Spoke1 VPC AZ A 中的应用实例只能访问在 Spoke2 VPC AZ A 中的应用实例，但是不能访问在 Spoke2 VPC AZ B 中的应用实例
