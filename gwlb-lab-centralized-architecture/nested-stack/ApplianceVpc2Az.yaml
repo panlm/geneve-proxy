@@ -1,11 +1,11 @@
 # Following example shows how to create AWS Gateway Load Balancer (GWLB)
-# Appliance VPC for centralized architecture using AWS CloudFormation. 
+# Appliance VPC for centralized architecture using AWS CloudFormation.
 
 # For architecture details refer to blog:
 # https://aws.amazon.com/blogs/networking-and-content-delivery/centralized-inspection-architecture-with-aws-gateway-load-balancer-and-aws-transit-gateway/
 
 # Template uses Amazon Linux 2 instances as appliances behind the GWLB.
-# Configures iptables on instances for hairpin setup. The hairpin setup 
+# Configures iptables on instances for hairpin setup. The hairpin setup
 # allows traffic coming from GWLB on appliance to be sent back to GWLB.
 
 # iptables configuration is for sample purpose only. It allows all the traffic! Use it for GWLB POC only**
@@ -17,7 +17,7 @@ Description: >-
   Archite For Gateway Load Balancer (GWLB). It creates a hairpin setup using
   iptables. Appliance VPC is created in the same account as Spoke VPCs and
   Transit Gateay.
-  
+
   This template creates:
     - 1 VPC
     - 1 IGW
@@ -28,18 +28,18 @@ Description: >-
       - port 22 access
       - port 80 access
       - All TCP, UDP and ICMP from VPC CIDR
-    - 2 Amazon Linux 2 instances acting as appliance in each AZ. 
-      Registered as targets behind a GWLB. Configures iptables on 
+    - 2 Amazon Linux 2 instances acting as appliance in each AZ.
+      Registered as targets behind a GWLB. Configures iptables on
       instances for hairpin setup
     - 1 Amazon Linux 2 acting as bastion host
     - 1 GWLB
-    - 1 Target group for GWLB 
+    - 1 Target group for GWLB
     - 1 Listner for GWLB
     - 1 VPC endpoint service
     - 2 GWLB endpoints, 1 in each AZ
-  
+
   **WARNING** This template creates one or more Amazon EC2 instances,
-  GWLB, GWLB endpints and NAT gateways. You will be billed for the AWS 
+  GWLB, GWLB endpints and NAT gateways. You will be billed for the AWS
   resources used if you create a stack from this template.
 
 Metadata:
@@ -61,17 +61,17 @@ Metadata:
           default: Appliance Configuration
         Parameters:
           - ApplianceInstanceType
-          - ApplianceInstanceAmiId          
+          - ApplianceInstanceAmiId
           - ApplianceInstanceDiskSize
           - KeyPairName
-          - AccessLocation          
+          - AccessLocation
       - Label:
           default: Gateway Load Balancer Configuration
         Parameters:
           - GwlbName
           - TargetGroupName
           - HealthPort
-          - HealthProtocol          
+          - HealthProtocol
       - Label:
           default: Appliance VPC Route Table Configuration
         Parameters:
@@ -80,7 +80,7 @@ Metadata:
 
     ParameterLabels:
       VpcCidr:
-        default: Appliance VPC - Network CIDR for VPC   
+        default: Appliance VPC - Network CIDR for VPC
       AvailabilityZone1:
         default: Appliance VPC - Availability Zone 1
       TgwAttachSubnet1Cidr:
@@ -90,7 +90,7 @@ Metadata:
       NatgwSubnet1Cidr:
         default: Appliance VPC - NAT GW Subnet 1 CIDR in AZ1
       AvailabilityZone2:
-        default: Availability Zone 2        
+        default: Availability Zone 2
       TgwAttachSubnet2Cidr:
         default: Appliance VPC - TGW Attachment Subnet 2 CIDR in AZ2
       ApplianceSubnet2Cidr:
@@ -100,7 +100,7 @@ Metadata:
       ApplianceInstanceType:
         default: Appliance Instance Type
       ApplianceInstanceAmiId:
-        default: Latest AMI ID for appliance (ec2 instance)        
+        default: Latest AMI ID for appliance (ec2 instance)
       ApplianceInstanceDiskSize:
         default: Appliance Instance Size in GB
       KeyPairName:
@@ -110,7 +110,7 @@ Metadata:
       Spoke1VpcCidr:
         default: Spoke1 VPC Network CIDR
       Spoke2VpcCidr:
-        default: Spoke2 VPC Network CIDR       
+        default: Spoke2 VPC Network CIDR
       GwlbName:
         default: Appliance VPC - Gateway Load Balancer Name
       TargetGroupName:
@@ -118,7 +118,7 @@ Metadata:
       HealthPort:
         default: Appliance VPC - Health Check Port
       HealthProtocol:
-        default: Appliance VPC - Health Check Protocol   
+        default: Appliance VPC - Health Check Protocol
 
 Parameters:
   VpcCidr:
@@ -148,7 +148,7 @@ Parameters:
     Default: 192.168.1.32/28
     Description: Appliance VPC - NAT GW Subnet 1 CIDR in AZ1
     Type: String
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28    
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
   AvailabilityZone2:
     Description: Appliance VPC - Availability Zone 2
     Type: AWS::EC2::AvailabilityZone::Name
@@ -176,6 +176,7 @@ Parameters:
     Default: t2.micro
     AllowedValues:
       - t2.micro
+      - t3.small
     Type: String
   ApplianceInstanceAmiId:
     Description: EC2 Instance AMI ID retrieved using SSM
@@ -211,11 +212,11 @@ Parameters:
     AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
     Default: 10.0.1.0/24
     Type: String
-    ConstraintDescription: Must be a valid Network CIDR of the form x.x.x.x/y  
+    ConstraintDescription: Must be a valid Network CIDR of the form x.x.x.x/y
   GwlbName:
     Description: >-
-      Gateway Load Balancer name. This name must be unique within your AWS 
-      account and can have a maximum of 32 alphanumeric characters and 
+      Gateway Load Balancer name. This name must be unique within your AWS
+      account and can have a maximum of 32 alphanumeric characters and
       hyphens. A name cannot begin or end with a hyphen.
     Type: String
     Default: gwlb1
@@ -234,12 +235,12 @@ Parameters:
     AllowedValues: ['TCP', 'HTTP', 'HTTPS']
     ConstraintDescription: Must be a valid health check protocol
   HealthPort:
-    Description: >- 
+    Description: >-
       The port the load balancer uses when performing health checks
       on targets. Default is 80.
     Type: String
     Default: '80'
-    ConstraintDescription: Must be a valid health check port    
+    ConstraintDescription: Must be a valid health check port
 
 Resources:
 
@@ -258,7 +259,7 @@ Resources:
             - ""
             - - !Ref AWS::StackName
               - "-vpc"
-  
+
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -268,7 +269,7 @@ Resources:
             - ""
             - - !Ref AWS::StackName
               - "-igw"
-  
+
   AttachInternetGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
@@ -310,7 +311,7 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-natgw-subnet-1"
-  
+
   # AZ2:
   TgwAttachSubnet2:
     Type: AWS::EC2::Subnet
@@ -381,7 +382,7 @@ Resources:
       - Key: Name
         Value: !Sub "${AWS::StackName}-natgw-2"
 
-# Create Route Tables: 
+# Create Route Tables:
 
   # AZ1:
   TgwAttachRouteTable1:
@@ -441,7 +442,7 @@ Resources:
     Properties:
       SubnetId: !Ref TgwAttachSubnet1
       RouteTableId: !Ref TgwAttachRouteTable1
-  
+
   ApplianceSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -460,7 +461,7 @@ Resources:
     Properties:
       SubnetId: !Ref TgwAttachSubnet2
       RouteTableId: !Ref TgwAttachRouteTable2
-  
+
   ApplianceSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -495,7 +496,7 @@ Resources:
         - CidrIp: !Ref VpcCidr
           IpProtocol: "-1"
           FromPort: -1
-          ToPort: -1          
+          ToPort: -1
       SecurityGroupEgress:
         - CidrIp: 0.0.0.0/0
           IpProtocol: "-1"
@@ -529,7 +530,7 @@ Resources:
         - CidrIp: !Ref VpcCidr
           IpProtocol: "-1"
           FromPort: -1
-          ToPort: -1          
+          ToPort: -1
       SecurityGroupEgress:
         - CidrIp: 0.0.0.0/0
           IpProtocol: "-1"
@@ -575,7 +576,7 @@ Resources:
         - !Ref ApplianceRole
 
   Appliance1:
-    DependsOn: 
+    DependsOn:
       - Gwlb
       - ApplianceRtb1Natgw1Route
     Type: AWS::EC2::Instance
@@ -597,26 +598,26 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash -ex
-          
+
           # Install packages:
           yum update -y;
           yum install jq -y;
           yum install httpd -y;
           yum install htop -y;
           yum install iptables-services -y;
-          
+
           # Enable IP Forwarding and persist across reboot:
           # sysctl -w net.ipv4.ip_forward=1;
           echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/00-defaults.conf
-          sysctl -p /etc/sysctl.d/00-defaults.conf          
+          sysctl -p /etc/sysctl.d/00-defaults.conf
 
           # Configure hostname:
           hostnamectl set-hostname ${AWS::StackName}-appliance1;
-          
+
           # Configure SSH client alive interval for ssh session timeout:
           echo 'ClientAliveInterval 60' | sudo tee --append /etc/ssh/sshd_config;
           service sshd restart;
-          
+
           # Set dark background for vim:
           touch /home/ec2-user/.vimrc;
           echo "set background=dark" >> /home/ec2-user/.vimrc;
@@ -647,7 +648,7 @@ Resources:
           # Start and configure iptables:
           systemctl enable iptables;
           systemctl start iptables;
-          
+
           # Configuration below allows allows all traffic:
           # Set the default policies for each of the built-in chains to ACCEPT:
           iptables -P INPUT ACCEPT;
@@ -668,9 +669,9 @@ Resources:
           service iptables save;
 
   Appliance2:
-    DependsOn: 
+    DependsOn:
       - Gwlb
-      - ApplianceRtb2Natgw2Route  
+      - ApplianceRtb2Natgw2Route
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Ref ApplianceInstanceAmiId
@@ -690,14 +691,14 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash -ex
-          
+
           # Install packages:
           yum update -y;
           yum install jq -y;
           yum install httpd -y;
           yum install htop -y;
           yum install iptables-services -y;
-          
+
           # Enable IP Forwarding and persist across reboot:
           # sysctl -w net.ipv4.ip_forward=1;
           echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/00-defaults.conf
@@ -705,11 +706,11 @@ Resources:
 
           # Configure hostname:
           hostnamectl set-hostname ${AWS::StackName}-appliance2;
-          
+
           # Configure SSH client alive interval for ssh session timeout:
           echo 'ClientAliveInterval 60' | sudo tee --append /etc/ssh/sshd_config;
           service sshd restart;
-          
+
           # Set dark background for vim:
           touch /home/ec2-user/.vimrc;
           echo "set background=dark" >> /home/ec2-user/.vimrc;
@@ -795,7 +796,7 @@ Resources:
           # Configure SSH client alive interval for ssh session timeout:
           echo 'ClientAliveInterval 60' | sudo tee --append /etc/ssh/sshd_config;
           service sshd restart;
-          
+
           # Set dark background for vim:
           touch /home/ec2-user/.vimrc;
           echo "set background=dark" >> /home/ec2-user/.vimrc;
@@ -914,7 +915,7 @@ Resources:
               ec2 = boto3.client('ec2')
           except ClientError as e:
               logger.error(f"ERROR: failed to connect to EC2 client: {e}")
-              sys.exit(1)              
+              sys.exit(1)
 
           def handler(event, context):
               logger = logging.getLogger()
@@ -925,12 +926,12 @@ Resources:
               responseStatus = cfnresponse.FAILED
 
               try:
-                  serviceid = event["ResourceProperties"]["VpceServiceId"]                
+                  serviceid = event["ResourceProperties"]["VpceServiceId"]
               except Exception as e:
                   logger.info('Attribute retrival failure: {}'.format(e))
 
               try:
-                  if event["RequestType"] == "Delete":    
+                  if event["RequestType"] == "Delete":
                       responseStatus = cfnresponse.SUCCESS
                       cfnresponse.send(event, context, responseStatus, responseData)
               except Exception:
@@ -955,7 +956,7 @@ Resources:
 
                   time.sleep(120)
 
-                  responseData['ServiceName'] = service_name             
+                  responseData['ServiceName'] = service_name
                   responseStatus = cfnresponse.SUCCESS
                   cfnresponse.send(event, context, responseStatus, responseData)
       Runtime: python3.7
@@ -1020,7 +1021,7 @@ Resources:
       DestinationCidrBlock: !Ref AccessLocation
       NatGatewayId: !Ref Natgw1
       RouteTableId: !Ref ApplianceRouteTable1
-  
+
   TgwAttachRtb1Gwlbe1Route:
     Type: AWS::EC2::Route
     DependsOn: GwlbEndpoint1
@@ -1061,7 +1062,7 @@ Resources:
       DestinationCidrBlock: !Ref AccessLocation
       NatGatewayId: !Ref Natgw2
       RouteTableId: !Ref ApplianceRouteTable2
-  
+
   TgwAttachRtb2Gwlbe2Route:
     Type: AWS::EC2::Route
     DependsOn: GwlbEndpoint2
@@ -1091,7 +1092,7 @@ Outputs:
     Value: !Ref TgwAttachSubnet1
   ApplianceTgwAttachSubnet2Id:
     Description: Appliance VPC TgwAttachSubnet2 ID
-    Value: !Ref TgwAttachSubnet2       
+    Value: !Ref TgwAttachSubnet2
   ApplianceRtb1Id:
     Description: Appliance VPC gwlb-rtb1's id
     Value: !Ref ApplianceRouteTable1

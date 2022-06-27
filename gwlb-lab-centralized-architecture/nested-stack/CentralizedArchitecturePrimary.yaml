@@ -17,9 +17,9 @@ Description: >-
   AWS CloudFormation Sample Template For deploying AWS Gateway Load Balancer
   (GWLB) in centralized architecture. This primary template, using nested
   stacks, creates appropriate resources arcoss 2 AZs.
-  
+
   **WARNING** This template creates one or more Amazon EC2 instances,
-  GWLB, GWLB endpints, NAT gateways and Transit Gateway. You will be billed for the AWS 
+  GWLB, GWLB endpints, NAT gateways and Transit Gateway. You will be billed for the AWS
   resources used if you create a stack from this template.
 
 Metadata:
@@ -37,7 +37,7 @@ Metadata:
           - EC2InstanceAmiId
           - EC2InstanceDiskSize
           - KeyPairName
-          - AccessLocation          
+          - AccessLocation
       - Label:
           default: Appliance VPC - Network Configuration
         Parameters:
@@ -64,7 +64,7 @@ Metadata:
           - Spoke1VpcBastionSubnet1Cidr
           - Spoke1VpcApplicationSubnet2Cidr
           - Spoke1VpcTgwAttachSubnet2Cidr
-          - Spoke1VpcBastionSubnet2Cidr          
+          - Spoke1VpcBastionSubnet2Cidr
       - Label:
           default: Spoke 2 VPC - Network Configuration
         Parameters:
@@ -84,13 +84,13 @@ Metadata:
       EC2InstanceType:
         default: Ec2 Instance Type
       EC2InstanceAmiId:
-        default: Latest AMI ID for EC2 intance        
+        default: Latest AMI ID for EC2 intance
       EC2InstanceDiskSize:
         default: Appliance Instance Size in GB
       KeyPairName:
         default: KeyPair required for accessing Appliance instance
       AccessLocation:
-        default: Network CIDR to access Appliance instance        
+        default: Network CIDR to access Appliance instance
       ApplianceVpcCidr:
         default: Appliance VPC - Network CIDR for VPC
       ApplianceVpcTgwAttachSubnet1Cidr:
@@ -98,13 +98,13 @@ Metadata:
       ApplianceVpcApplianceSubnet1Cidr:
         default: Appliance VPC - Appliance Subnet 1 CIDR in AZ1
       ApplianceVpcNatgwSubnet1Cidr:
-        default: Appliance VPC - NAT GW Subnet 1 CIDR in AZ1     
+        default: Appliance VPC - NAT GW Subnet 1 CIDR in AZ1
       ApplianceVpcTgwAttachSubnet2Cidr:
         default: Appliance VPC - TGW Attachment Subnet 2 CIDR in AZ2
       ApplianceVpcApplianceSubnet2Cidr:
         default: Appliance VPC - Appliance Subnet 2 CIDR in AZ2
       ApplianceVpcNatgwSubnet2Cidr:
-        default: Appliance VPC - NAT GW Subnet 2 CIDR in AZ2     
+        default: Appliance VPC - NAT GW Subnet 2 CIDR in AZ2
       ApplianceVpcGwlbName:
         default: Appliance VPC - Gateway Load Balancer Name
       ApplianceVpcTargetGroupName:
@@ -114,21 +114,21 @@ Metadata:
       ApplianceVpcHealthProtocol:
         default: Appliance VPC - Health Check Protocol
       Spoke1VpcCidr:
-        default: Spoke1 VPC - VPC CIDR       
+        default: Spoke1 VPC - VPC CIDR
       Spoke1VpcApplicationSubnet1Cidr:
         default: Spoke1 VPC - Application Subnet 1 CIDR
       Spoke1VpcTgwAttachSubnet1Cidr:
         default: Spoke1 VPC - TGW Attachment Subnet 1 CIDR
       Spoke1VpcBastionSubnet1Cidr:
-        default: Spoke1 VPC - Bastion Subnet 1 CIDR    
+        default: Spoke1 VPC - Bastion Subnet 1 CIDR
       Spoke1VpcApplicationSubnet2Cidr:
         default: Spoke1 VPC - Application Subnet 2 CIDR
       Spoke1VpcTgwAttachSubnet2Cidr:
         default: Spoke1 VPC - TGW Attachment Subnet 2 CIDR
       Spoke1VpcBastionSubnet2Cidr:
-        default: Spoke1 VPC - Bastion Subnet 2 CIDR        
+        default: Spoke1 VPC - Bastion Subnet 2 CIDR
       Spoke2VpcCidr:
-        default: Spoke2 VPC - VPC CIDR    
+        default: Spoke2 VPC - VPC CIDR
       Spoke2VpcApplicationSubnet1Cidr:
         default: Spoke2 VPC - Application Subnet 1 CIDR
       Spoke2VpcTgwAttachSubnet1Cidr:
@@ -140,7 +140,7 @@ Metadata:
       Spoke2VpcTgwAttachSubnet2Cidr:
         default: Spoke2 VPC - TGW Attachment Subnet 2 CIDR
       Spoke2VpcBastionSubnet2Cidr:
-        default: Spoke2 VPC - Bastion Subnet 2 CIDR        
+        default: Spoke2 VPC - Bastion Subnet 2 CIDR
 
 Parameters:
   # Generic Parameters:
@@ -157,10 +157,11 @@ Parameters:
     Default: t2.micro
     AllowedValues:
       - t2.micro
+      - t3.small
     Type: String
   EC2InstanceAmiId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'    
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
   EC2InstanceDiskSize:
     Description: EC2 instance disk size in GB. Default is set to 8GB
     Default: 8
@@ -188,7 +189,7 @@ Parameters:
     Description: Appliance VPC - CIDR block for the VPC
     Type: String
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/y
-  # AZ1:    
+  # AZ1:
   ApplianceVpcTgwAttachSubnet1Cidr:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
     Default: 192.168.1.0/28
@@ -207,7 +208,7 @@ Parameters:
     Description: Appliance VPC - NAT GW Subnet 1 CIDR in AZ1
     Type: String
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
-  # AZ2:    
+  # AZ2:
   ApplianceVpcTgwAttachSubnet2Cidr:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
     Default: 192.168.1.48/28
@@ -228,8 +229,8 @@ Parameters:
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
   ApplianceVpcGwlbName:
     Description: >-
-      Gateway Load Balancer name. This name must be unique within your AWS 
-      account and can have a maximum of 32 alphanumeric characters and 
+      Gateway Load Balancer name. This name must be unique within your AWS
+      account and can have a maximum of 32 alphanumeric characters and
       hyphens. A name cannot begin or end with a hyphen.
     Type: String
     Default: gwlb1
@@ -248,7 +249,7 @@ Parameters:
     AllowedValues: ['TCP', 'HTTP', 'HTTPS']
     ConstraintDescription: Must be a valid health check protocol
   ApplianceVpcHealthPort:
-    Description: >- 
+    Description: >-
       The port the load balancer uses when performing health checks
       on targets. Default is 80.
     Type: String
@@ -261,7 +262,7 @@ Parameters:
     Description: Spoke1 VPC - CIDR block for the VPC
     Type: String
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
-  # AZ1:    
+  # AZ1:
   Spoke1VpcApplicationSubnet1Cidr:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
     Default: 10.0.0.0/28
@@ -279,7 +280,7 @@ Parameters:
     Default: 10.0.0.64/28
     Description: Spoke1 VPC - Bastion Subnet 1 CIDR in Availability Zone 1
     Type: String
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28    
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
   # AZ2:
   Spoke1VpcApplicationSubnet2Cidr:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
@@ -298,7 +299,7 @@ Parameters:
     Default: 10.0.0.80/28
     Description: Spoke1 VPC - Bastion Subnet 2 CIDR in Availability Zone 2
     Type: String
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28    
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
   # Spoke2 VPC specific parameters:
   Spoke2VpcCidr:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
@@ -306,26 +307,26 @@ Parameters:
     Description: Spoke2 VPC - CIDR block for the VPC
     Type: String
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
-  # AZ1:    
+  # AZ1:
   Spoke2VpcApplicationSubnet1Cidr:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
     Default: 10.0.1.0/28
     Description: Spoke2 VPC - Application Subnet 1 CIDR in Availability Zone 1
     Type: String
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28    
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
   Spoke2VpcTgwAttachSubnet1Cidr:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
     Default: 10.0.1.16/28
     Description: Spoke2 VPC - TGW Attachment Subnet 1 CIDR in Availability Zone 1
     Type: String
-    ConstraintDescription: Subnet CIDR parameter must be in the form x.x.x.x/16-28 
+    ConstraintDescription: Subnet CIDR parameter must be in the form x.x.x.x/16-28
   Spoke2VpcBastionSubnet1Cidr:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
     Default: 10.0.1.64/28
     Description: Spoke2 VPC - Bastion Subnet 1 CIDR in Availability Zone 1
     Type: String
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
-  # AZ2:      
+  # AZ2:
   Spoke2VpcApplicationSubnet2Cidr:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
     Default: 10.0.1.32/28
@@ -343,7 +344,7 @@ Parameters:
     Default: 10.0.1.80/28
     Description: Spoke2 VPC - Bastion Subnet 2 CIDR in Availability Zone 2
     Type: String
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28    
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
 
 Resources:
   ApplianceVpcStack:
