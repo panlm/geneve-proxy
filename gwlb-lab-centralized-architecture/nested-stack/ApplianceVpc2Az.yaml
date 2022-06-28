@@ -272,6 +272,8 @@ Resources:
 
   AttachInternetGateway:
     Type: AWS::EC2::VPCGatewayAttachment
+    DependsOn:
+      - InternetGateway
     Properties:
       VpcId: !Ref Vpc
       InternetGatewayId: !Ref InternetGateway
@@ -972,6 +974,8 @@ Resources:
 
   GwlbEndpoint1:
     Type: AWS::EC2::VPCEndpoint
+    DependsOn:
+      - Gwlb
     Properties:
       VpcId: !Ref Vpc
       ServiceName: !GetAtt RetrieveVpceServiceName.ServiceName
@@ -980,6 +984,8 @@ Resources:
         - !Ref ApplianceSubnet1
 
   GwlbEndpoint2:
+    DependsOn:
+      - Gwlb
     Type: AWS::EC2::VPCEndpoint
     Properties:
       VpcId: !Ref Vpc
@@ -994,7 +1000,7 @@ Resources:
     Type: AWS::EC2::Route
     DependsOn: AttachInternetGateway
     Properties:
-      DestinationCidrBlock: !Ref AccessLocation
+      DestinationCidrBlock: '0.0.0.0/0'
       GatewayId: !Ref InternetGateway
       RouteTableId: !Ref NatGwRouteTable1
 
@@ -1018,7 +1024,7 @@ Resources:
     Type: AWS::EC2::Route
     DependsOn: Natgw1
     Properties:
-      DestinationCidrBlock: !Ref AccessLocation
+      DestinationCidrBlock: '0.0.0.0/0'
       NatGatewayId: !Ref Natgw1
       RouteTableId: !Ref ApplianceRouteTable1
 
@@ -1026,7 +1032,7 @@ Resources:
     Type: AWS::EC2::Route
     DependsOn: GwlbEndpoint1
     Properties:
-      DestinationCidrBlock: !Ref AccessLocation
+      DestinationCidrBlock: '0.0.0.0/0'
       VpcEndpointId: !Ref GwlbEndpoint1
       RouteTableId: !Ref TgwAttachRouteTable1
 
@@ -1035,7 +1041,7 @@ Resources:
     Type: AWS::EC2::Route
     DependsOn: AttachInternetGateway
     Properties:
-      DestinationCidrBlock: !Ref AccessLocation
+      DestinationCidrBlock: '0.0.0.0/0'
       GatewayId: !Ref InternetGateway
       RouteTableId: !Ref NatGwRouteTable2
 
@@ -1059,7 +1065,7 @@ Resources:
     Type: AWS::EC2::Route
     DependsOn: Natgw2
     Properties:
-      DestinationCidrBlock: !Ref AccessLocation
+      DestinationCidrBlock: '0.0.0.0/0'
       NatGatewayId: !Ref Natgw2
       RouteTableId: !Ref ApplianceRouteTable2
 
@@ -1067,7 +1073,7 @@ Resources:
     Type: AWS::EC2::Route
     DependsOn: GwlbEndpoint2
     Properties:
-      DestinationCidrBlock: !Ref AccessLocation
+      DestinationCidrBlock: '0.0.0.0/0'
       VpcEndpointId: !Ref GwlbEndpoint2
       RouteTableId: !Ref TgwAttachRouteTable2
 

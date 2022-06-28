@@ -350,7 +350,8 @@ Resources:
   ApplianceVpcStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: 'https://s3-us-west-2.amazonaws.com/tech-content-us-west-2/aws-gwlb-cloudformation-samples/centralized-architecture/nested-stack/ApplianceVpc2Az.yaml'
+      #TemplateURL: 'https://s3-us-west-2.amazonaws.com/tech-content-us-west-2/aws-gwlb-cloudformation-samples/centralized-architecture/nested-stack/ApplianceVpc2Az.yaml'
+      TemplateURL: 'https://panlm-br-1350.s3.us-east-2.amazonaws.com/ApplianceVpc2Az.yaml'
       Parameters:
         VpcCidr: !Ref ApplianceVpcCidr
         AvailabilityZone1: !Ref AvailabilityZone1
@@ -376,7 +377,8 @@ Resources:
   Spoke1VpcStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: 'https://s3-us-west-2.amazonaws.com/tech-content-us-west-2/aws-gwlb-cloudformation-samples/centralized-architecture/nested-stack/SpokeVpc2Az.yaml'
+      #TemplateURL: 'https://s3-us-west-2.amazonaws.com/tech-content-us-west-2/aws-gwlb-cloudformation-samples/centralized-architecture/nested-stack/SpokeVpc2Az.yaml'
+      TemplateURL: 'https://panlm-br-1350.s3.us-east-2.amazonaws.com/SpokeVpc2Az.yaml'
       Parameters:
         VpcCidr: !Ref Spoke1VpcCidr
         AvailabilityZone1: !Ref AvailabilityZone1
@@ -396,7 +398,8 @@ Resources:
   Spoke2VpcStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: 'https://s3-us-west-2.amazonaws.com/tech-content-us-west-2/aws-gwlb-cloudformation-samples/centralized-architecture/nested-stack/SpokeVpc2Az.yaml'
+      #TemplateURL: 'https://s3-us-west-2.amazonaws.com/tech-content-us-west-2/aws-gwlb-cloudformation-samples/centralized-architecture/nested-stack/SpokeVpc2Az.yaml'
+      TemplateURL: 'https://panlm-br-1350.s3.us-east-2.amazonaws.com/SpokeVpc2Az.yaml'
       Parameters:
         VpcCidr: !Ref Spoke2VpcCidr
         AvailabilityZone1: !Ref AvailabilityZone1
@@ -417,7 +420,8 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: ['ApplianceVpcStack', 'Spoke1VpcStack', 'Spoke2VpcStack' ]
     Properties:
-      TemplateURL: 'https://s3-us-west-2.amazonaws.com/tech-content-us-west-2/aws-gwlb-cloudformation-samples/centralized-architecture/nested-stack/Tgw.yaml'
+      #TemplateURL: 'https://s3-us-west-2.amazonaws.com/tech-content-us-west-2/aws-gwlb-cloudformation-samples/centralized-architecture/nested-stack/Tgw.yaml'
+      TemplateURL: 'https://panlm-br-1350.s3.us-east-2.amazonaws.com/Tgw.yaml'
       Parameters:
         ApplianceVpcId: !GetAtt
           - ApplianceVpcStack

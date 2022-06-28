@@ -1,5 +1,5 @@
 # Following example shows how to create AWS Transit Gateway and connect with
-# Spoke VPCs and with Appliance VPC - hosting virtual appliances behind 
+# Spoke VPCs and with Appliance VPC - hosting virtual appliances behind
 # AWS Gateway Load Balancer (GWLB) using AWS CloudFormation.
 
 # For architecture details refer to blog:
@@ -11,7 +11,7 @@ Description: >-
   AWS CloudFormation sample template for TGW setup for Gateway Load Balancer
   (GWLB) in centralized architecture. TGW is created in the same AWS account
   as Appliance and Spoke VPCs.
-  
+
   This template creates:
     - 1 TGW
     - 3 VPC attachments, 2 for Spoke VPCs and one for Appliance VPC
@@ -24,7 +24,7 @@ Description: >-
       attachment as the target in Transit Route Table
     - Creates routes in Appliance VPC's Appliacetion Route Table with Transit
       Gateway as the target
-  
+
   **WARNING** This template creates Transit Gateway with 3 VPC attachments. You
   will be billed for the AWS resources used if you create a stack from this template.
 
@@ -102,23 +102,23 @@ Parameters:
   ApplianceVpcId:
     Description: Appliance VPC ID
     Type: String
-    ConstraintDescription: Must be a valid VPC ID  
+    ConstraintDescription: Must be a valid VPC ID
   ApplianceVpcTgwAttachSubnet1Id:
     Description: Appliance VPC Subnet1 ID for TGW attachment in AZ1
     Type: String
-    ConstraintDescription: Must be a valid Subnet ID    
+    ConstraintDescription: Must be a valid Subnet ID
   ApplianceVpcTgwAttachSubnet2Id:
     Description: Appliance VPC Subnet2 ID for TGW attachment in AZ2
     Type: String
-    ConstraintDescription: Must be a valid Subnet ID  
+    ConstraintDescription: Must be a valid Subnet ID
   ApplianceVpcApplianceRtb1Id:
     Description: Appliance VPC Appliance Route Table 1 ID
     Type: String
-    ConstraintDescription: Must be a valid Route Table ID    
+    ConstraintDescription: Must be a valid Route Table ID
   ApplianceVpcApplianceRtb2Id:
     Description: Appliance VPC Appliance Route Table 2 ID
     Type: String
-    ConstraintDescription: Must be a valid Route Table ID     
+    ConstraintDescription: Must be a valid Route Table ID
   # Spoke1 VPC Parameters:
   Spoke1VpcId:
     Description: Spoke1 VPC ID
@@ -129,15 +129,15 @@ Parameters:
     Default: 10.0.0.0/24
     Description: Spoke1 VPC Network CIDR
     Type: String
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/y   
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/y
   Spoke1VpcTgwAttachSubnet1Id:
     Description: Spoke1 VPC Subnet1 ID for TGW attachment in AZ1
     Type: String
-    ConstraintDescription: Must be a valid Subnet ID  
+    ConstraintDescription: Must be a valid Subnet ID
   Spoke1VpcTgwAttachSubnet2Id:
     Description: Spoke1 VPC Subnet2 ID for TGW attachment in AZ2
     Type: String
-    ConstraintDescription: Must be a valid Subnet ID  
+    ConstraintDescription: Must be a valid Subnet ID
   Spoke1VpcRtb1Id:
     Description: Spoke1 VPC Application Route Table ID
     Type: String
@@ -152,20 +152,20 @@ Parameters:
     Default: 10.0.1.0/24
     Description: Spoke2 VPC Network CIDR
     Type: String
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/y  
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/y
   Spoke2VpcTgwAttachSubnet1Id:
     Description: Spoke2 VPC Subnet1 ID for TGW attachment in AZ1
     Type: String
-    ConstraintDescription: Must be a valid Subnet ID  
+    ConstraintDescription: Must be a valid Subnet ID
   Spoke2VpcTgwAttachSubnet2Id:
     Description: Spoke2 VPC Subnet2 ID for TGW attachment in AZ2
     Type: String
-    ConstraintDescription: Must be a valid Subnet ID  
+    ConstraintDescription: Must be a valid Subnet ID
   Spoke2VpcRtb1Id:
     Description: Spoke2 VPC Application Route Table ID
     Type: String
-    ConstraintDescription: Must be a valid Route Table ID  
-  # Network CIDR Parameter:    
+    ConstraintDescription: Must be a valid Route Table ID
+  # Network CIDR Parameter:
   AccessLocation:
     Description: >-
       Enter desired Network CIDR to access Bastion Host. Default is set to
@@ -233,16 +233,16 @@ Resources:
 # Create Transit Gateway Route Tables:
   Tgw1TransitRtb:
     Type: AWS::EC2::TransitGatewayRouteTable
-    Properties: 
-      Tags: 
+    Properties:
+      Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-tgw-transit-rtb"   
+          Value: !Sub "${AWS::StackName}-tgw-transit-rtb"
       TransitGatewayId: !Ref Tgw1
 
   Tgw1EgressRtb:
     Type: AWS::EC2::TransitGatewayRouteTable
-    Properties: 
-      Tags: 
+    Properties:
+      Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-tgw-egress-rtb"
       TransitGatewayId: !Ref Tgw1
@@ -250,21 +250,21 @@ Resources:
 # Create Transit Gateway Attachment Associations:
   Tgw1ApplianceVpcAttachmentAssociation:
     Type: AWS::EC2::TransitGatewayRouteTableAssociation
-    Properties: 
+    Properties:
       TransitGatewayAttachmentId: !Ref Tgw1ApplianceVpcAttachment
       TransitGatewayRouteTableId: !Ref Tgw1TransitRtb
 
   Tgw1Spoke1VpcAttachmentAssociation:
     Type: AWS::EC2::TransitGatewayRouteTableAssociation
-    Properties: 
+    Properties:
       TransitGatewayAttachmentId: !Ref Tgw1Spoke1VpcAttachment
       TransitGatewayRouteTableId: !Ref Tgw1EgressRtb
 
   Tgw1Spoke2VpcAttachmentAssociation:
     Type: AWS::EC2::TransitGatewayRouteTableAssociation
-    Properties: 
+    Properties:
       TransitGatewayAttachmentId: !Ref Tgw1Spoke2VpcAttachment
-      TransitGatewayRouteTableId: !Ref Tgw1EgressRtb      
+      TransitGatewayRouteTableId: !Ref Tgw1EgressRtb
 
 # Create Transit Gateway Routes:
   Tgw1Route1:
@@ -285,7 +285,7 @@ Resources:
     Type: AWS::EC2::TransitGatewayRoute
     Properties:
       TransitGatewayAttachmentId: !Ref Tgw1ApplianceVpcAttachment
-      DestinationCidrBlock: !Ref AccessLocation
+      DestinationCidrBlock: '0.0.0.0/0'
       TransitGatewayRouteTableId: !Ref Tgw1EgressRtb
 
 # Add TGW as Target to VPC Route Tables:
@@ -294,7 +294,7 @@ Resources:
   AddRoute1ApplianceVpc:
     DependsOn:
       - Tgw1
-      - Tgw1ApplianceVpcAttachment     
+      - Tgw1ApplianceVpcAttachment
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: !Ref Spoke1VpcCidr
@@ -302,7 +302,7 @@ Resources:
       RouteTableId: !Ref ApplianceVpcApplianceRtb1Id
 
   AddRoute2ApplianceVpc:
-    DependsOn: [Tgw1, Tgw1ApplianceVpcAttachment]  
+    DependsOn: [Tgw1, Tgw1ApplianceVpcAttachment]
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: !Ref Spoke2VpcCidr
@@ -310,7 +310,7 @@ Resources:
       RouteTableId: !Ref ApplianceVpcApplianceRtb1Id
   # AZ2:
   AddRoute3ApplianceVpc:
-    DependsOn: [Tgw1, Tgw1ApplianceVpcAttachment] 
+    DependsOn: [Tgw1, Tgw1ApplianceVpcAttachment]
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: !Ref Spoke1VpcCidr
@@ -318,28 +318,28 @@ Resources:
       RouteTableId: !Ref ApplianceVpcApplianceRtb2Id
 
   AddRoute4ApplianceVpc:
-    DependsOn: [Tgw1, Tgw1ApplianceVpcAttachment] 
+    DependsOn: [Tgw1, Tgw1ApplianceVpcAttachment]
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: !Ref Spoke2VpcCidr
       TransitGatewayId: !Ref Tgw1
-      RouteTableId: !Ref ApplianceVpcApplianceRtb2Id  
-  
+      RouteTableId: !Ref ApplianceVpcApplianceRtb2Id
+
   # Spoke1 VPC route table configuration:
   AddRoute1Spoke1Vpc:
     DependsOn: [Tgw1, Tgw1Spoke1VpcAttachment]
     Type: AWS::EC2::Route
     Properties:
-      DestinationCidrBlock: !Ref AccessLocation
+      DestinationCidrBlock: '0.0.0.0/0'
       TransitGatewayId: !Ref Tgw1
-      RouteTableId: !Ref Spoke1VpcRtb1Id 
+      RouteTableId: !Ref Spoke1VpcRtb1Id
 
   # Spoke2 VPC route table configuration:
   AddRoute1Spoke2Vpc:
     DependsOn: [Tgw1, Tgw1Spoke1VpcAttachment]
     Type: AWS::EC2::Route
     Properties:
-      DestinationCidrBlock: !Ref AccessLocation
+      DestinationCidrBlock: '0.0.0.0/0'
       TransitGatewayId: !Ref Tgw1
       RouteTableId: !Ref Spoke2VpcRtb1Id
 
@@ -453,4 +453,4 @@ Outputs:
     Value: !Ref Tgw1ApplianceVpcAttachment
   ApplianceVpcApplianceModeStatus:
     Description: Transit Gateway Appliance VPC Attachment Appliance Mode Status
-    Value: !GetAtt ApplianceModeEnabled.ApplianceModeStatus 
+    Value: !GetAtt ApplianceModeEnabled.ApplianceModeStatus

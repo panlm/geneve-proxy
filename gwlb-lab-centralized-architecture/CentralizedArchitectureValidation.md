@@ -13,12 +13,14 @@
 ![](images/appliance_vpc_stack_outputs.jpg)
 
 ```sh
-sudo yum install -y jq
-key_file=key # 输入 private key 路径
-region_name=us-east-1 # 选择你的区域
+key_file=awskey # 输入 private key 路径
+region_name=us-east-2 # 选择你的区域
 stack_name=GwlbCentralizedDemo
+
+sudo yum install -y jq
+export AWS_DEFAULT_REGION=$region_name
 sub_stack_name=$(aws cloudformation describe-stack-resources \
-  --stack-name $stack_name --region $region_name |\
+  --stack-name $stack_name |\
   jq -r '.StackResources[].PhysicalResourceId' |\
   awk -F'/' '{print $2}')
 tgw_stack_name=$(echo $sub_stack_name |xargs -n 1 |grep 'TgwStack')
