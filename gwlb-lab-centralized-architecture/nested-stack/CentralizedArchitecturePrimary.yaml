@@ -157,7 +157,6 @@ Parameters:
     Default: t2.micro
     AllowedValues:
       - t2.micro
-      - t3.small
     Type: String
   EC2InstanceAmiId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>

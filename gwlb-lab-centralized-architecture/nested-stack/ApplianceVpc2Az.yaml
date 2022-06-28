@@ -176,7 +176,6 @@ Parameters:
     Default: t2.micro
     AllowedValues:
       - t2.micro
-      - t3.small
     Type: String
   ApplianceInstanceAmiId:
     Description: EC2 Instance AMI ID retrieved using SSM
