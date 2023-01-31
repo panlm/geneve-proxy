@@ -8,7 +8,7 @@
 
 ### 验证从 Spoke1 VPC 中运行的应用程序访问 Internet
 
-* 通过以下脚本从cloudformation堆栈中获取各vpc的堡垒主机的公共 IP 地址和相关的私有 IP 地址。
+* 通过以下脚本从cloudformation堆栈中获取各vpc的堡垒主机的公共 IP 地址和相关的私有 IP 地址。方便登录验证
 
 ![](images/appliance_vpc_stack_outputs.jpg)
 
@@ -68,10 +68,10 @@ echo "export appliance2_priv_ip=$appliance2_priv_ip" >> ~/.bash_profile
 cat $key_file |\
   ssh ec2-user@$appliance_bastion_pub_ip -i $key_file \
     'cat - > /tmp/key ; chmod 600 /tmp/key'
-echo "ssh ec2-user@$appliance1_priv_ip -i /tmp/key" |\
+echo "ssh -o StrictHostKeyChecking=no ec2-user@$appliance1_priv_ip -i /tmp/key" |\
   ssh ec2-user@$appliance_bastion_pub_ip -i $key_file \
     'cat - > ~/connect-to-appliance1.sh ; chmod a+x ~/connect-to-appliance1.sh'
-echo "ssh ec2-user@$appliance2_priv_ip -i /tmp/key" |\
+echo "ssh -o StrictHostKeyChecking=no ec2-user@$appliance2_priv_ip -i /tmp/key" |\
   ssh ec2-user@$appliance_bastion_pub_ip -i $key_file \
     'cat - > ~/connect-to-appliance2.sh ; chmod a+x ~/connect-to-appliance2.sh'
 
@@ -97,10 +97,10 @@ echo "export spoke1_application2_priv_ip=$spoke1_application2_priv_ip" >> ~/.bas
 cat $key_file |\
   ssh ec2-user@$spoke1_bastion_pub_ip -i $key_file \
     'cat - > /tmp/key ; chmod 600 /tmp/key'
-echo "ssh ec2-user@$spoke1_application1_priv_ip -i /tmp/key" |\
+echo "ssh -o StrictHostKeyChecking=no ec2-user@$spoke1_application1_priv_ip -i /tmp/key" |\
   ssh ec2-user@$spoke1_bastion_pub_ip -i $key_file \
     'cat - > ~/connect-to-application1.sh ; chmod a+x ~/connect-to-application1.sh'
-echo "ssh ec2-user@$spoke1_application2_priv_ip -i /tmp/key" |\
+echo "ssh -o StrictHostKeyChecking=no ec2-user@$spoke1_application2_priv_ip -i /tmp/key" |\
   ssh ec2-user@$spoke1_bastion_pub_ip -i $key_file \
     'cat - > ~/connect-to-application2.sh ; chmod a+x ~/connect-to-application2.sh'
 
@@ -126,10 +126,10 @@ echo "export spoke2_application2_priv_ip=$spoke2_application2_priv_ip" >> ~/.bas
 cat $key_file |\
   ssh ec2-user@$spoke2_bastion_pub_ip -i $key_file \
     'cat - > /tmp/key ; chmod 600 /tmp/key'
-echo "ssh ec2-user@$spoke2_application1_priv_ip -i /tmp/key" |\
+echo "ssh -o StrictHostKeyChecking=no ec2-user@$spoke2_application1_priv_ip -i /tmp/key" |\
   ssh ec2-user@$spoke2_bastion_pub_ip -i $key_file \
     'cat - > ~/connect-to-application1.sh ; chmod a+x ~/connect-to-application1.sh'
-echo "ssh ec2-user@$spoke2_application2_priv_ip -i /tmp/key" |\
+echo "ssh -o StrictHostKeyChecking=no ec2-user@$spoke2_application2_priv_ip -i /tmp/key" |\
   ssh ec2-user@$spoke2_bastion_pub_ip -i $key_file \
     'cat - > ~/connect-to-application2.sh ; chmod a+x ~/connect-to-application2.sh'
 

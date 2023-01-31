@@ -53,6 +53,9 @@ aws ec2 modify-transit-gateway-vpc-attachment \
   * 虽然上面的链接在俄勒冈 (us-west-2) 区域启动堆栈，但您可以将区域更改为您的选择。 确保您选择在其中部署堆栈的区域支持 GWLB。
   * 部署模版时：1）指定两个不同的可用区；2）指定 key pair
 
+* 我的版本修复了一些SG的问题 [link](https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/create/template?stackName=GwlbCentralizedDemo&templateURL=https://panlm-br-1350.s3.us-east-2.amazonaws.com/CentralizedArchitecturePrimary.yaml)
+* 另外还有一个适用于中国区的版本 [link](https://cn-northwest-1.console.amazonaws.cn/cloudformation/home?region=cn-northwest-1#/stacks/create/template?stackName=GwlbCentralizedDemo&templateURL=https://panlm-br-1350.s3.us-east-2.amazonaws.com/cn/CentralizedArchitecturePrimary.yaml)
+
 * 你可以找到所有模版文件在[nested-stack](nested-stack)目录下
 
 ### 验证步骤:
